@@ -3,6 +3,7 @@ package com.example.hp.youtubeapi;
 import android.content.res.Resources;
 import android.graphics.Rect;
 import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -13,21 +14,33 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class ListVideos extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private Adapter adapter;
     private List<Video> list;
+    TextView name,views,likes,duration,dislikes;
+    public static final String TAG = "ll";
 
 
     @Override
@@ -40,13 +53,18 @@ public class ListVideos extends AppCompatActivity {
         initCollapsingToolbar();
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        name  =(TextView)findViewById(R.id.name) ;
+        views = (TextView)findViewById(R.id.views1);
+        likes = (TextView)findViewById(R.id.likes1);
+        dislikes = (TextView)findViewById(R.id.dislikes1);
+        duration = (TextView)findViewById(R.id.duration1);
 
         list = new ArrayList<>();
         adapter = new Adapter(this,list);
 
-        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this,2);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(10), true));
+        //recyclerView.addItemDecoration(new GridSpacingItemDecoration(1, dpToPx(10), true));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adapter);
 
@@ -87,78 +105,124 @@ public class ListVideos extends AppCompatActivity {
     }
 
 
-    private void prepareAlbums() {
+    private void prepareAlbums(){
 
-        Video v = new Video("3VW9Cecwr7s","Taped up heart");
-        list.add(v);
-        v = new Video("7KfhSftf1p0","avalon");
-        list.add(v);
-        v = new Video("iUNxOzxPEVI","I am not her");
-        list.add(v);
-        v = new Video("g_tBZSs83eg","I forgot");
-        list.add(v);
-        v = new Video("M3zYpoAaewk","Sure not something");
-        list.add(v);
-        v = new Video("UzbnYbagpFY","Drowning");
-        list.add(v);
-        v = new Video("3VW9Cecwr7s","Taped up heart");
-        list.add(v);
-        v = new Video("7KfhSftf1p0","avalon");
-        list.add(v);
-        v = new Video("iUNxOzxPEVI","I am not her");
-        list.add(v);
-        v = new Video("g_tBZSs83eg","I forgot");
-        list.add(v);
-        v = new Video("M3zYpoAaewk","Sure not something");
-        list.add(v);
-        v = new Video("UzbnYbagpFY","Drowning");
-        list.add(v);
+        Task task;
+        task = new Task();
+        task.execute("3VW9Cecwr7s");
+        task = new Task();
+        task.execute("7KfhSftf1p0");
+        task = new Task();
+        task.execute("g_tBZSs83eg");
+        task = new Task();
+        task.execute("M3zYpoAaewk");
+        task = new Task();
+        task.execute("3VW9Cecwr7s");
+        task = new Task();
+        task.execute("7KfhSftf1p0");
+        task = new Task();
+        task.execute("g_tBZSs83eg");
+        task = new Task();
+        task.execute("M3zYpoAaewk");
 
-
-        adapter.notifyDataSetChanged();
     }
 
+    public class Task extends AsyncTask<String, String, String> {
 
-    public class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
-
-        private int spanCount;
-        private int spacing;
-        private boolean includeEdge;
-
-        public GridSpacingItemDecoration(int spanCount, int spacing, boolean includeEdge) {
-            this.spanCount = spanCount;
-            this.spacing = spacing;
-            this.includeEdge = includeEdge;
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
         }
 
         @Override
-        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
-            int position = parent.getChildAdapterPosition(view); // item position
-            int column = position % spanCount; // item column
-
-            if (includeEdge) {
-                outRect.left = spacing - column * spacing / spanCount; // spacing - column * ((1f / spanCount) * spacing)
-                outRect.right = (column + 1) * spacing / spanCount; // (column + 1) * ((1f / spanCount) * spacing)
-
-                if (position < spanCount) { // top edge
-                    outRect.top = spacing;
+        protected String doInBackground(String... str) {
+            String url1 = "https://www.googleapis.com/youtube/v3/videos?id="+str[0]+"&key=AIzaSyCjcIu3lFJR7_lvdTAB553_ZXFcLg3NmcY&part=snippet,contentDetails,statistics";
+            OkHttpClient client = new OkHttpClient();
+            Request request = new Request.Builder().url(url1).build();
+            Response response = null;
+            try {
+                response = client.newCall(request).execute();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            String result = null;
+            try {
+                result = response.body().string();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Gson gson = new Gson();
+            final json1 j = gson.fromJson(result,json1.class);
+            ListVideos.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    name.setText(String.valueOf(j.getItems().get(0).getSnippet().getTitle()));
+                    likes.setText(String.valueOf(j.getItems().get(0).getStatistics().getLikeCount()));
+                    views.setText(String.valueOf(j.getItems().get(0).getStatistics().getViewCount()));
+                    duration.setText(String.valueOf(j.getItems().get(0).getContentDetails().getDuration()));
+                    dislikes.setText(String.valueOf(j.getItems().get(0).getStatistics().getDislikeCount()));
                 }
-                outRect.bottom = spacing; // item bottom
-            } else {
-                outRect.left = column * spacing / spanCount; // column * ((1f / spanCount) * spacing)
-                outRect.right = spacing - (column + 1) * spacing / spanCount; // spacing - (column + 1) * ((1f /    spanCount) * spacing)
-                if (position >= spanCount) {
-                    outRect.top = spacing; // item top
+            });
+            return str[0];
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            String name2 = String.valueOf(name.getText());
+            String likes2 = String.valueOf(likes.getText());
+            String views2 = String.valueOf(views.getText());
+            String dislikes2 = String.valueOf(dislikes.getText());
+            String duration2 = String.valueOf(duration.getText());
+            Log.d(TAG, "onPostExecute: "+duration2);
+            String h=null,m=null,sec=null;
+            for(int i=0;i<duration2.length();i++) {
+                Log.d(TAG, "onPostExecute1: " + duration2);
+                if (duration2.charAt(i) == 'H') {
+                    if (Character.isDigit(duration2.charAt(i - 2))) {
+                        h = duration2.substring(i - 2, i);
+                    } else {
+                        h = duration2.substring(i - 1, i);
+                    }
+
+                } else if (duration2.charAt(i) == 'M') {
+                    if (Character.isDigit(duration2.charAt(i - 2))) {
+                        m = duration2.substring(i - 2, i);
+                        Log.d(TAG, "onPostExecute2: " + m);
+
+                    } else {
+                        m = duration2.substring(i - 1, i);
+                        Log.d(TAG, "onPostExecute2: " + m);
+
+                    }
+
+                } else if (duration2.charAt(i) == 'S') {
+                    if (Character.isDigit(duration2.charAt(i - 2))) {
+                        sec = duration2.substring(i - 2, i);
+                    } else {
+                        sec = duration2.substring(i - 1, i);
+                    }
+
                 }
             }
-        }
-    }
+                if(h==null && m==null)
+                {
+                    duration2 = sec+" sec";
+                }
+                else if(h==null)
+                {
+                    duration2 = m+" min "+sec+" sec";
+                }
+                else
+                {
+                    duration2 = h+" hr "+m+" min "+sec+" sec";
+                }
 
-    /**
-     * Converting dp to pixel
-     */
-    private int dpToPx(int dp) {
-        Resources r = getResources();
-        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics()));
+            Video v = new Video(s,name2,likes2,views2,duration2,dislikes2);
+            list.add(v);
+            adapter.notifyDataSetChanged();
+
+        }
+
     }
 }
