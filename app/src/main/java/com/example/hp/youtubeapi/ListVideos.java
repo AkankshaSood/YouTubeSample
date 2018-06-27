@@ -39,7 +39,7 @@ public class ListVideos extends AppCompatActivity {
     private RecyclerView recyclerView;
     private Adapter adapter;
     private List<Video> list;
-    TextView name,views,likes,duration,dislikes;
+    TextView name,views,likes,duration,channel,date;
     public static final String TAG = "ll";
 
 
@@ -56,8 +56,9 @@ public class ListVideos extends AppCompatActivity {
         name  =(TextView)findViewById(R.id.name) ;
         views = (TextView)findViewById(R.id.views1);
         likes = (TextView)findViewById(R.id.likes1);
-        dislikes = (TextView)findViewById(R.id.dislikes1);
         duration = (TextView)findViewById(R.id.duration1);
+        channel  = (TextView)findViewById(R.id.channel1);
+        date = (TextView)findViewById(R.id.date1) ;
 
         list = new ArrayList<>();
         adapter = new Adapter(this,list);
@@ -160,7 +161,8 @@ public class ListVideos extends AppCompatActivity {
                     likes.setText(String.valueOf(j.getItems().get(0).getStatistics().getLikeCount()));
                     views.setText(String.valueOf(j.getItems().get(0).getStatistics().getViewCount()));
                     duration.setText(String.valueOf(j.getItems().get(0).getContentDetails().getDuration()));
-                    dislikes.setText(String.valueOf(j.getItems().get(0).getStatistics().getDislikeCount()));
+                    date.setText(String.valueOf(j.getItems().get(0).getSnippet().getPublishedAt()));
+                    channel.setText(String.valueOf(j.getItems().get(0).getSnippet().getChannelName()));
                 }
             });
             return str[0];
@@ -172,8 +174,9 @@ public class ListVideos extends AppCompatActivity {
             String name2 = String.valueOf(name.getText());
             String likes2 = String.valueOf(likes.getText());
             String views2 = String.valueOf(views.getText());
-            String dislikes2 = String.valueOf(dislikes.getText());
+            String date2 = String.valueOf(date.getText());
             String duration2 = String.valueOf(duration.getText());
+            String channel2 = String.valueOf(channel.getText());
             Log.d(TAG, "onPostExecute: "+duration2);
             String h=null,m=null,sec=null;
             for(int i=0;i<duration2.length();i++) {
@@ -207,18 +210,20 @@ public class ListVideos extends AppCompatActivity {
             }
                 if(h==null && m==null)
                 {
-                    duration2 = sec+" sec";
+                    duration2 = "0:"+sec;
                 }
                 else if(h==null)
                 {
-                    duration2 = m+" min "+sec+" sec";
+                    duration2 = m+":"+sec;
                 }
                 else
                 {
-                    duration2 = h+" hr "+m+" min "+sec+" sec";
+                    duration2 = h+":"+m+":"+sec;
                 }
 
-            Video v = new Video(s,name2,likes2,views2,duration2,dislikes2);
+                date2 = date2.substring(0,10);
+
+            Video v = new Video(s,name2,likes2,views2,duration2,channel2,date2);
             list.add(v);
             adapter.notifyDataSetChanged();
 

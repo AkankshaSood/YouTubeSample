@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
@@ -44,7 +45,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder> {
     private SparseBooleanArray expandState = new SparseBooleanArray();
 
     public class MyViewHolder extends RecyclerView.ViewHolder  {
-        public TextView title,views,likes,duration,dislikes;
+        public TextView title,views,likes,duration,channel,date;
         public ImageView thumbnail;
         LinearLayout ParentLayout,expandableLayout;
         CardView cv;
@@ -55,7 +56,8 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder> {
             title = (TextView) view.findViewById(R.id.title);
             views = (TextView) view.findViewById(R.id.views);
             likes = (TextView) view.findViewById(R.id.likes);
-            dislikes = (TextView) view.findViewById(R.id.dislikes);
+            date = (TextView) view.findViewById(R.id.date);
+            channel = (TextView) view.findViewById(R.id.channel);
             duration = (TextView) view.findViewById(R.id.duration);
             thumbnail = (ImageView) view.findViewById(R.id.thumbnail);
             ParentLayout = (LinearLayout)view.findViewById(R.id.parent_layout);
@@ -87,11 +89,14 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder> {
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
         final Video video = videoList.get(position);
         final boolean isExpanded = expandState.get(position);
+        String sourceString = "</b>Channel: " + "<b> " + video.getChannel();
         holder.title.setText(video.getName());
-        holder.views.setText("Views: "+video.getViews());
-        holder.likes.setText("Likes: "+video.getLikes());
-        holder.duration.setText("Duration: "+video.getDuration());
-        holder.dislikes.setText("Dislikes: "+video.getDislikes());
+        holder.views.setText(video.getViews());
+        holder.likes.setText(video.getLikes());
+        holder.duration.setText(video.getDuration());
+        holder.channel.setText(Html.fromHtml(sourceString));
+        sourceString = "</b>Upload Date: " + "<b> " + video.getDate();
+        holder.date.setText(Html.fromHtml(sourceString));
 
         holder.expandableLayout.setVisibility(isExpanded?View.VISIBLE:View.GONE);
         holder.btn.setOnClickListener(new View.OnClickListener() {

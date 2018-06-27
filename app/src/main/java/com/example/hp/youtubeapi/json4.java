@@ -7,11 +7,11 @@ package com.example.hp.youtubeapi;
 public class json4 {
 
     String publishedAt;
-    String channelId;
+    String channelTitle;
     String title;
 
-    public String getChannelId() {
-        return channelId;
+    public String getChannelName() {
+        return channelTitle;
     }
 
     public String getPublishedAt() {
@@ -21,4 +21,6 @@ public class json4 {
     public String getTitle() {
         return title;
     }
+
+
 }

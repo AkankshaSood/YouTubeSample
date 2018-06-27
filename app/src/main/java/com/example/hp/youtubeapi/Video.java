@@ -24,9 +24,10 @@ public class Video {
     String views;
     String likes;
     String duration;
-    String dislikes;
+    String channel;
+    String date;
 
-    public Video(String id,String names,String likes,String views,String duration,String dislikes)
+    public Video(String id,String names,String likes,String views,String duration,String channel,String date)
     {
         this.id = id;
         this.name = names;
@@ -34,7 +35,8 @@ public class Video {
         this.views = views;
         imgURL = "https://img.youtube.com/vi/"+id+"/0.jpg";
         this.duration = duration;
-        this.dislikes = dislikes;
+        this.channel = channel;
+        this.date = date;
     }
 
 
@@ -71,8 +73,12 @@ public class Video {
         return duration;
     }
 
-    public String getDislikes() {
-        return dislikes;
+    public String getDate() {
+        return date;
+    }
+
+    public String getChannel() {
+        return channel;
     }
 
     public String makeNetworkCall(String url) {
